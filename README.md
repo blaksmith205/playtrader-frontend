@@ -16,9 +16,14 @@ npm start
 
 This will install the packages and start the development server.
 
+## Starting the Server
+
+To start the server, a few things need to happen. The first is to run in the background via `pm2 start src/index.js`.
+With the running in the background, now we can restart NGINX if needed with `systemctl restart nginx`. See [this guide](https://medium.com/nerd-for-tech/deploy-your-nodejs-application-to-a-digital-ocean-droplet-step-by-step-guide-3f6f928f776) for more info.
+
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\

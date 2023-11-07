@@ -19,9 +19,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-builder": "pm2 start --name Playtrader npm -- start",
+    "stop-builder": "pm2 kill",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "sh deploy.sh"
   },
   "eslintConfig": {
     "extends": [
