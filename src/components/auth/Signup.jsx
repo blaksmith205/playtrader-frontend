@@ -8,7 +8,7 @@ import { Stack, TextField, Button, InputAdornment } from '@mui/material';
 import {getAuth, createUserWithEmailAndPassword, updateProfile, fetchSignInMethodsForEmail} from 'firebase/auth';
 import './LoginSignup.css'
 
-const Signup = () => {
+const Signup = (redirect) => {
     const { control, handleSubmit, getValues, setError, formState: {errors} } = useForm()
     
     const onSubmit = (data) => {
@@ -53,6 +53,8 @@ const Signup = () => {
         createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
           updateProfile(user, { displayName: data.username });
+          // Go to the set redirect path after creating an account
+          window.location.pathname=redirect
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -82,10 +84,6 @@ const Signup = () => {
             className="container"
             component="form"
             id="signupForm"
-            sx={{
-                '& > :not(style)': { m: 1, width: '50ch' },
-            }}
-            noValidate="false"
             autoComplete="on"
             justifyContent="center"
             alignItems="center"
@@ -244,7 +242,6 @@ const Signup = () => {
             {errors.password2 && <p>{errors.password2.message}</p>}
             <Button
                 size="small"
-                fullWidth="false"
                 variant="contained"
                 type="submit">
                 Sign Up

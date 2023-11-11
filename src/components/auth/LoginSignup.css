@@ -3,7 +3,7 @@
     flex-direction: column;
     margin: auto;
     margin-top: 80px;
-    width: 600px;
+    width: 50ch;
     background: #fff;
     padding-bottom: 30px;
 }
@@ -28,21 +28,4 @@
     height: 6px;
     background: darkslategray;
     border-radius: 9px;
-}
-
-.forgot-password{
-    padding-left: 62px;
-    margin-top: 27px;
-    color: #797979;
-    font-size: 18px;
-}
-
-.forgot-password span{
-    color: slategray;
-    cursor: pointer;
-}
-
-.gray{
-    background: #eaeaea;
-    color: #676767;
 }

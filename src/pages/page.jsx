@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { BuilderComponent, builder, useIsPreviewing } from "@builder.io/react";
 import BUILDER_API_KEY from '../config.js';
+import NoPage from "./NoPage.jsx";
 
 // Put your API key here
 builder.init(BUILDER_API_KEY);
@@ -9,7 +10,7 @@ builder.init(BUILDER_API_KEY);
 // set whether you're using the Visual Editor,
 // whether there are changes,
 // and render the content if found
-export default function CatchAllRoute() {
+export default function BuilderPage({data}) {
   const isPreviewingInBuilder = useIsPreviewing();
   const [notFound, setNotFound] = useState(false);
   const [content, setContent] = useState(null);
@@ -40,14 +41,11 @@ export default function CatchAllRoute() {
   // The following hypothetical 
   // <FourOhFour> is placeholder.
   if (notFound && !isPreviewingInBuilder) {
-    return null
+    return (<NoPage/>)
   }
 
   // return the page when found
   return (
-    <>
-      {/* Render the Builder page */}
-      <BuilderComponent model="page" content={content} />
-    </>
+    <BuilderComponent data={data} model="page" content={content} />
   );
 }

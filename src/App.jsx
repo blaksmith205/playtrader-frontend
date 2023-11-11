@@ -1,7 +1,8 @@
 import './App.css';
-import CatchAllRoute from './pages/page.jsx';
+import BuilderPage from './pages/page.jsx';
 import NavigationBar from './components/navbar.jsx';
 import RegisterComponents from './components/register.jsx';
+import LoginSignup from './components/auth/LoginSignup.jsx';
 
 function App() {
   RegisterComponents();
@@ -11,7 +12,7 @@ function App() {
       <header>
         <NavigationBar />
       </header>
-      <CatchAllRoute/>
+      <BuilderPage />
     </div>
   );
 }
