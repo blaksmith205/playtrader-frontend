@@ -2,7 +2,7 @@ import React, { useState }from 'react';
 import Login from './Login';
 import Signup from './Signup';
 
-export default function LoginSignup({showLogin, redirect}) {
+const LoginSignup = ({showLogin, redirect}) => {
     const [login, setLogin] = useState(showLogin);
 
     return (
@@ -15,3 +15,5 @@ export default function LoginSignup({showLogin, redirect}) {
         </>
     )
 }
+
+export default LoginSignup;
