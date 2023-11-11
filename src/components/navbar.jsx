@@ -17,23 +17,18 @@ import BUILDER_API_KEY from '../config';
 builder.init(BUILDER_API_KEY);
 
 export default function NavigationBar() {
-  const contacts = [
-    { url: "/", text: "Home" },
-    { url: "/leaderboards", text: "Leaderboards" },
-    { url: "/about", text: "About Us" }
-  ];
   const [show, setShow] = useState(null);
-  const [links, setLinks] = useState(contacts);
+  const [links, setLinks] = useState([]);
 
   // Get the CMS data from Builder
-  // useEffect(() => {
-  //   async function fetchContent() {
-  //     const nav_links = await builder.getAll("nav-links", {});
-  //     setLinks(nav_links);
-  //     console.log(nav_links)
-  //   }
-  //   fetchContent();
-  // }, []);
+  useEffect(() => {
+    async function fetchContent() {
+      const nav_links = await builder.getAll("nav-links", {});
+      setLinks(nav_links);
+      console.log(nav_links)
+    }
+    fetchContent();
+  }, []);
 
   return (
     <AppBar position="static">
@@ -44,8 +39,6 @@ export default function NavigationBar() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Playtrader
         </Typography>
-        <Button color="inherit">Stocks</Button>
-        <Button color="inherit" href="/login">Login</Button>
       </Toolbar>
       <Drawer anchor="left" open={show} onClose={() => setShow(false)}>
         <List>

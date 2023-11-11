@@ -1,19 +1,19 @@
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BuilderComponent, builder, useIsPreviewing } from "@builder.io/react";
 import BUILDER_API_KEY from '../config.js';
-import NoPage from "./NoPage.jsx";
+import NotFound from "./NotFound.jsx";
+import LoadingPage from "./LoadingPage.jsx";
 
-// Put your API key here
 builder.init(BUILDER_API_KEY);
 
 // set whether you're using the Visual Editor,
 // whether there are changes,
 // and render the content if found
-export default function BuilderPage({data}) {
+export default function CatchAllPage() {
   const isPreviewingInBuilder = useIsPreviewing();
   const [notFound, setNotFound] = useState(false);
   const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // get the page content from Builder
    useEffect(() => {
@@ -26,26 +26,28 @@ export default function BuilderPage({data}) {
 
       setContent(content);
       setNotFound(!content);
-
       // if the page title is found, 
       // set the document title
       if (content?.data.title) {
        document.title = content.data.title
       }
+      setLoading(false);
     }
     fetchContent();
-  }, [window.location.pathname]);
+  });
   
+  if (loading) {
+    return (
+      <LoadingPage/>
+    )
+  }
   // If no page is found, return 
   // a 404 page from your code.
-  // The following hypothetical 
-  // <FourOhFour> is placeholder.
   if (notFound && !isPreviewingInBuilder) {
-    return (<NoPage/>)
+    return (<NotFound/>)
   }
-
   // return the page when found
   return (
-    <BuilderComponent data={data} model="page" content={content} />
+    <BuilderComponent model="page" content={content}/>
   );
 }

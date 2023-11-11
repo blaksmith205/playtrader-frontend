@@ -61,9 +61,10 @@ const Login = ({redirect, signup}) => {
             id="loginForm"
             autoComplete="on"
             spacing={2}
+            noValidate
             onSubmit={handleSubmit(onSubmit)}>
-            <Grid item xs={12}>
-                <div className='header' fullwidth>
+            <Grid xs={12}>
+                <div className='header'>
                     <div className="text">Login</div>
                     <div className="underline"></div>
                 </div>
@@ -79,7 +80,6 @@ const Login = ({redirect, signup}) => {
                     <Grid xs={12}>
                         <TextField
                             required
-                            fullwidth
                             value={field.value}
                             error={fieldState.error}
                             name={field.name}

@@ -5,11 +5,11 @@ import EmailIcon from '@mui/icons-material/Email';
 import PasswordIcon from '@mui/icons-material/Password';
 import { useForm, Controller } from "react-hook-form";
 import { Stack, TextField, Button, InputAdornment } from '@mui/material';
-import {getAuth, createUserWithEmailAndPassword, updateProfile, fetchSignInMethodsForEmail} from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import './LoginSignup.css'
 
 const Signup = (redirect) => {
-    const { control, handleSubmit, getValues, setError, formState: {errors} } = useForm()
+    const { control, handleSubmit, getValues, setError, formState: {errors} } = useForm({mode: "onBlur"})
     
     const onSubmit = (data) => {
         createUser(data);
@@ -88,6 +88,7 @@ const Signup = (redirect) => {
             justifyContent="center"
             alignItems="center"
             spacing={2}
+            noValidate
             onSubmit={handleSubmit(onSubmit)}>
             <div className='header'>
                 <div className="text">Sign Up</div>
@@ -100,14 +101,14 @@ const Signup = (redirect) => {
                     required: true,
                     pattern: /^[a-zA-Z0-9_\.]+$/,
                     validate: (username) => {
-                        return isUsernameUnique(username);
+                        isUsernameUnique(username);
                     }
                 }}
                 render = {({ field, fieldState }) =>
                     <TextField
                         required
                         value={field.value}
-                        error={fieldState.error}
+                        error={Boolean(fieldState.error)}
                         name={field.name}
                         onChange={field.onChange}
                         inputRef={field.ref}
@@ -129,7 +130,7 @@ const Signup = (redirect) => {
                 render = {({ field, fieldState }) =>
                     <TextField
                         value={field.value}
-                        error={fieldState.error}
+                        error={Boolean(fieldState.error)}
                         name={field.name}
                         onChange={field.onChange}
                         inputRef={field.ref}
@@ -155,7 +156,7 @@ const Signup = (redirect) => {
                     <TextField
                         required
                         value={field.value}
-                        error={fieldState.error}
+                        error={Boolean(fieldState.error)}
                         name={field.name}
                         onChange={field.onChange}
                         inputRef={field.ref}
@@ -179,14 +180,14 @@ const Signup = (redirect) => {
                     required: true,
                     minLength: 8,
                     validate: (password, field) => {
-                        return validatePassword(password, field.name);
+                        validatePassword(password, field?.name);
                     }
                 }}
                 render = {({ field, fieldState }) =>
                     <TextField
                         required
                         value={field.value}
-                        error={fieldState.error}
+                        error={Boolean(fieldState.error)}
                         name={field.name}
                         onChange={field.onChange}
                         inputRef={field.ref}
@@ -213,16 +214,16 @@ const Signup = (redirect) => {
                     validate: (password) => {
                         const password1 = getValues("password");
                         if (validatePassword(password)) {
-                            return doesPasswordsMatch(password1, password);
+                            return String(doesPasswordsMatch(password1, password));
                         }
-                        return false;
+                        return "false";
                     }
                 }}
                 render = {({ field, fieldState }) =>
                     <TextField
                         required
                         value={field.value}
-                        error={fieldState.error}
+                        error={Boolean(fieldState.error)}
                         name={field.name}
                         onChange={field.onChange}
                         inputRef={field.ref}
