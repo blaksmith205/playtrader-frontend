@@ -1,4 +1,5 @@
 import React, { useState }from 'react'
+import { useNavigate } from 'react-router-dom';
 import EmailIcon from '@mui/icons-material/Email';
 import PasswordIcon from '@mui/icons-material/Password';
 import { useForm, Controller } from "react-hook-form";
@@ -14,6 +15,8 @@ const Login = ({redirect, signup}) => {
     const [userLogged, setUserLogged] = useState(false);
     const { control, handleSubmit } = useForm()
 
+    const navigate = useNavigate();
+
     const onSubmit = (data) => {
         setLoading(true);
         login(data);
@@ -26,7 +29,7 @@ const Login = ({redirect, signup}) => {
         .then(({ user }) => {
             setLoading(false);
             // Go to the set redirect path when logged in
-            window.location.pathname=redirect
+            navigate(redirect);
         })
         .catch((error) => {
             var errorCode = error.code;
