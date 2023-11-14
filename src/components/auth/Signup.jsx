@@ -101,7 +101,7 @@ const Signup = (redirect) => {
                     required: true,
                     pattern: /^[a-zA-Z0-9_\.]+$/,
                     validate: (username) => {
-                        isUsernameUnique(username);
+                        return isUsernameUnique(username);
                     }
                 }}
                 render = {({ field, fieldState }) =>
@@ -180,7 +180,7 @@ const Signup = (redirect) => {
                     required: true,
                     minLength: 8,
                     validate: (password, field) => {
-                        validatePassword(password, field?.name);
+                        return validatePassword(password, field?.name);
                     }
                 }}
                 render = {({ field, fieldState }) =>
@@ -214,9 +214,9 @@ const Signup = (redirect) => {
                     validate: (password) => {
                         const password1 = getValues("password");
                         if (validatePassword(password)) {
-                            return String(doesPasswordsMatch(password1, password));
+                            return doesPasswordsMatch(password1, password);
                         }
-                        return "false";
+                        return false;
                     }
                 }}
                 render = {({ field, fieldState }) =>

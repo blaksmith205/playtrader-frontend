@@ -1,4 +1,4 @@
-import React, { useState }from 'react'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmailIcon from '@mui/icons-material/Email';
 import PasswordIcon from '@mui/icons-material/Password';
