@@ -19,5 +19,6 @@ export default function RegisterComponents() {
     });
     Builder.registerComponent(DynamicStockTable, {
         name: "DynamicStockTable",
+        inputs: [{ name: "Start Amount", type: "number", defaultValue: 10000}]
     });
 }
