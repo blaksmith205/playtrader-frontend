@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { builder } from "@builder.io/react";
 import { DataGrid, GridEditInputCell} from '@mui/x-data-grid';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const round = (value, decimals) => {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -19,11 +21,14 @@ const DynamicStockTable = ({startValue}) => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
     const [startAmount] = useState(startValue ? startValue : 10000);
+    const [user] = useState(getAuth().currentUser);
+    const docRef = doc(getFirestore(), 'stocks', user.uid);
 
-    const makeRow = (response, index) => {
+
+    const makeRow = (response, index, bought) => {
         const q = response.data.results[0];
         const obj = stocks.find(({ticker}) => ticker.toUpperCase() === q.T);
-        const ret = {company: obj?.companyName, ticker: q.T, price: q.c, amount:0, id:index};
+        const ret = {company: obj?.companyName, ticker: q.T, price: bought ? bought.price : q.c, amount: bought ? bought.amount : 0, id:index, key:index};
         return ret;
     }
 
@@ -32,31 +37,31 @@ const DynamicStockTable = ({startValue}) => {
         { field: 'ticker', headerName: 'Ticker', flex: 1 },
         { field: 'price', headerName: 'Current Price', flex: 1, type: 'number' },
         {
-          field: 'amount',
-          headerName: '# of Shares',
-          type: 'number',
-          flex: 1,
-          editable: true,
-          renderEditCell: (params) => (
+        field: 'amount',
+        headerName: '# of Shares',
+        type: 'number',
+        flex: 1,
+        editable: true,
+        renderEditCell: (params) => (
             <GridEditInputCell
-              {...params}
-              inputProps={{
+            {...params}
+            inputProps={{
 
                 min: 0,
-              }}
+            }}
             />
-          ),
+        ),
         },
         {
-          field: 'total',
-          headerName: `Total Price ($${total})`,
-          description: 'The total price of the stocks',
-          sortable: false,
-          flex: 1,
-          valueGetter: (params) =>
+        field: 'total',
+        headerName: `Total Price ($${total})`,
+        description: 'The total price of the stocks',
+        sortable: false,
+        flex: 1,
+        valueGetter: (params) =>
             `$${calcTotal(params.row.price, params.row.amount)}`,
         },
-    ];
+    ]; 
 
     const handleRowUpdate = (updatedRow, originalRow) => {
         // Find the index of the row that was edited
@@ -96,15 +101,40 @@ const DynamicStockTable = ({startValue}) => {
             fetchStockData(stock.ticker)
         )))
         .then((val) => {
-            setRows(val.map((resp, index) => (makeRow(resp, index))));
+            // Get connection with the database.
+            getDoc(docRef).then((res) => {
+                if (res.exists()) {
+                    setRows(val.map((resp, index) => {
+                        var boughtIndex = res.data().bought.findIndex((row) => (row.id===index));
+                        return makeRow(resp, index, boughtIndex > -1 && res.data().bought[boughtIndex]);
+                    }));
+                } else {
+                    setRows(val.map((resp, index) => {
+                        return makeRow(resp, index);
+                    }));
+                }
+            });
         })
         .catch(console.error);
     }, [stocks])
 
     useEffect(() => {
         var total = 0;
-        rows.forEach((elem) => total += elem.price * elem.amount);
+        var toSave = [];
+        rows.forEach((row) => {
+            if (row.amount > 0) {
+                // Update the total
+                total += row.price * row.amount;
+                // Save the row
+                toSave.push(row)
+            }
+        });
         setTotal(round(total, 2));
+        if (toSave.length > 0) {
+            updateDoc(docRef, {
+                bought: toSave
+            });
+        }
     }, [rows]);
 
     return (
@@ -112,9 +142,8 @@ const DynamicStockTable = ({startValue}) => {
             <DataGrid
                 rows={rows}
                 columns={columns}
-                disableSelectionOnClick
                 editMode='row'
-                rowM
+                disableSelectionOnClick
                 processRowUpdate={handleRowUpdate}
                 onPaginationModelChange={(model) => setPageModel(model)}
                 paginationModel={pageModel}

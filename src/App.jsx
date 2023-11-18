@@ -36,7 +36,7 @@ function App() {
 
   getAuth().onAuthStateChanged((user) => {
     if (user) {
-        setUser(user);
+      setUser(user);
     } else {
       setUser(null);
     }
