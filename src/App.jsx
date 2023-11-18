@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { builder } from "@builder.io/react";
+import { getAuth } from 'firebase/auth';
 import RegisterComponents from './components/register.jsx';
 import MenuBar from './components/MenuBar.jsx';
 import BuilderPage from './pages/BuilderPage.jsx';
 import CatchAllPage from './pages/CatchAllPage.jsx';
 import BUILDER_API_KEY from './config';
 import './App.css';
-import DynamicStockTable from './components/DynamicStockTable.jsx';
 
 function App() {
 
   const [navLinks, setNavLinks] = useState([]);
   const [links, setLinks] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Register componets and initialize builder once
@@ -29,20 +30,29 @@ function App() {
       });
       setLinks(vals);
     }
+    
     fetchLinks();
   }, []);
+
+  getAuth().onAuthStateChanged((user) => {
+    if (user) {
+        setUser(user);
+    } else {
+      setUser(null);
+    }
+  });
 
   return (
     <div className="App">
       <BrowserRouter basename="/">
         <header>
-          <MenuBar appName="Playtrader" links={navLinks}/>
+          <MenuBar appName="Playtrader" links={navLinks} user={user}/>
         </header>
         <Routes>
+          <Route path="/login" element={<BuilderPage path="/login" user={user} hide={{url:"/"}}/>}/>
           {links.toReversed().map((link) => (
-            <Route path={link.url} element={<BuilderPage path={link.url}/>}/>
+            <Route path={link.url} element={<BuilderPage path={link.url} requireAuth={link.requireAuth} user={user}/>}/>
           ))}
-          <Route path="/login" element={<BuilderPage path="/login"/>}/>
           <Route element = {<CatchAllPage />} />
         </Routes>
       </BrowserRouter>

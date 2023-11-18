@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,15 +14,22 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import { getAuth, signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
 
-function MenuBar({appName, links}) {
+function MenuBar({user, appName, links}) {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [user, setUser] = useState(null);
   const [pages, setPages] = useState(null);
   const [settings, setSettings] = useState(null);
+  
+  const logout = () => {
+    if (user) {
+      getAuth().signOut()
+      .then(() => {
+        navigate({to:'/', replace:true});
+      })
+      .catch(console.error)
+    }
+  }
 
   const navigate = useNavigate();
 
@@ -45,17 +54,8 @@ function MenuBar({appName, links}) {
     } else{
       handleCloseNavMenu();
     }
-    if (url === "/logout") {
-      signOut(getAuth())
-      .then(() => {
-        setUser(null);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-      });
+    if (url==="/logout") {
+      logout();
     } else {
       navigate(url);
     }
@@ -71,12 +71,12 @@ function MenuBar({appName, links}) {
     </Button>);
   }
 
-  const renderProfile = (user) => {
+  const renderProfile = () => {
     return (
       <>
         <Tooltip title="Open settings">
           <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-            <Avatar alt={user?.display} src="/static/images/avatar/2.jpg" />
+            <Avatar alt={user?.displayName} src="/static/images/avatar/2.jpg" />
           </IconButton>
         </Tooltip>
         <Menu
@@ -103,16 +103,6 @@ function MenuBar({appName, links}) {
       </>
     );
   }
-  useEffect(() => {
-    getAuth()?.onAuthStateChanged((user) => {
-        if (user) {
-            setUser(user);
-        } else {
-            // Signed out
-            setUser(null);
-        }
-      });
-  }, []);
 
   useEffect(() => {
     links.forEach((elem) => {
@@ -220,7 +210,7 @@ function MenuBar({appName, links}) {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {Boolean(user) ? renderProfile(user) : renderLogin()}
+            {user ? renderProfile() : renderLogin()}
           </Box>
         </Toolbar>
       </Container>

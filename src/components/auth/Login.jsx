@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmailIcon from '@mui/icons-material/Email';
 import PasswordIcon from '@mui/icons-material/Password';
@@ -11,23 +11,13 @@ import './LoginSignup.css'
 
 const Login = ({redirect, signup}) => {
 
-    const [loading, setLoading] = useState(false);
-    const [userLogged, setUserLogged] = useState(false);
     const { control, handleSubmit } = useForm()
 
     const navigate = useNavigate();
 
-    const onSubmit = (data) => {
-        setLoading(true);
-        login(data);
-    }
-
-    const auth = getAuth();
-
     const login = (data) => {
-        signInWithEmailAndPassword (auth, data.email, data.password)
+        signInWithEmailAndPassword (getAuth() , data.email, data.password)
         .then(({ user }) => {
-            setLoading(false);
             // Go to the set redirect path when logged in
             navigate(redirect);
         })
@@ -65,7 +55,7 @@ const Login = ({redirect, signup}) => {
             autoComplete="on"
             spacing={2}
             noValidate
-            onSubmit={handleSubmit(onSubmit)}>
+            onSubmit={handleSubmit(login)}>
             <Grid xs={12}>
                 <div className='header'>
                     <div className="text">Login</div>
