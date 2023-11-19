@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { builder } from "@builder.io/react";
-import { DataGrid, GridEditInputCell} from '@mui/x-data-grid';
+import { DataGrid, GridEditInputCell } from '@mui/x-data-grid';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const round = (value, decimals) => {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -22,8 +22,7 @@ const DynamicStockTable = ({startValue}) => {
     const [total, setTotal] = useState(0);
     const [startAmount] = useState(startValue ? startValue : 10000);
     const [user] = useState(getAuth().currentUser);
-    const docRef = doc(getFirestore(), 'stocks', user.uid);
-
+    const [docRef, setDocRef] = useState(null);
 
     const makeRow = (response, index, bought) => {
         const q = response.data.results[0];
@@ -92,6 +91,12 @@ const DynamicStockTable = ({startValue}) => {
     }, []);
 
     useEffect(() => {
+        if (user) {
+            setDocRef(doc(getFirestore(), 'stocks', user.uid));
+        }
+    }, [user]);
+
+    useEffect(() => {
         async function fetchStockData (ticker) {
             return axios.get(`https://api.polygon.io/v2/aggs/ticker/${ticker.toUpperCase()}/prev?adjusted=true&apiKey=63bfjVzpHfxgOnOuhwctRgDJMUVsFPMV`)
                 .catch(console.error);
@@ -101,19 +106,23 @@ const DynamicStockTable = ({startValue}) => {
             fetchStockData(stock.ticker)
         )))
         .then((val) => {
-            // Get connection with the database.
-            getDoc(docRef).then((res) => {
-                if (res.exists()) {
-                    setRows(val.map((resp, index) => {
-                        var boughtIndex = res.data().bought.findIndex((row) => (row.id===index));
-                        return makeRow(resp, index, boughtIndex > -1 && res.data().bought[boughtIndex]);
-                    }));
-                } else {
-                    setRows(val.map((resp, index) => {
-                        return makeRow(resp, index);
-                    }));
-                }
-            });
+            if (docRef) {
+                // Get connection with the database.
+                getDoc(docRef).then((res) => {
+                    if (res.exists()) {
+                        setRows(val.map((resp, index) => {
+                            var boughtIndex = res.data().bought.findIndex((row) => (row.id===index));
+                            return makeRow(resp, index, boughtIndex > -1 && res.data().bought[boughtIndex]);
+                        }));
+                    } else {
+                        // Create a stocks database in Firestore to be updated later
+                        setDoc(docRef, {bought:[]});
+                        setRows(val.map((resp, index) => {
+                            return makeRow(resp, index);
+                        }));
+                    }
+                });
+            }
         })
         .catch(console.error);
     }, [stocks])
@@ -130,7 +139,7 @@ const DynamicStockTable = ({startValue}) => {
             }
         });
         setTotal(round(total, 2));
-        if (toSave.length > 0) {
+        if (toSave.length > 0 && docRef) {
             updateDoc(docRef, {
                 bought: toSave
             });

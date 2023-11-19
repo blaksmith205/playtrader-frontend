@@ -23,10 +23,8 @@ function MenuBar({user, appName, links}) {
   
   const logout = () => {
     if (user) {
+      navigate("/", {replace:true});
       getAuth().signOut()
-      .then(() => {
-        navigate({to:'/', replace:true});
-      })
       .catch(console.error)
     }
   }

@@ -20,6 +20,15 @@ function App() {
     RegisterComponents();
     builder.init(BUILDER_API_KEY);
 
+    // Only create the listener once
+    getAuth().onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
     async function fetchLinks() {
       // Obtain the links from builder.io once
       const allLinks = await builder.getAll("nav-links", {});
@@ -33,14 +42,6 @@ function App() {
     
     fetchLinks();
   }, []);
-
-  getAuth().onAuthStateChanged((user) => {
-    if (user) {
-      setUser(user);
-    } else {
-      setUser(null);
-    }
-  });
 
   return (
     <div className="App">

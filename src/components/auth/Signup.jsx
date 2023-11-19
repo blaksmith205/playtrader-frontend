@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
@@ -10,11 +11,7 @@ import './LoginSignup.css'
 
 const Signup = (redirect) => {
     const { control, handleSubmit, getValues, setError, formState: {errors} } = useForm({mode: "onBlur"})
-    
-    const onSubmit = (data) => {
-        createUser(data);
-    }
-
+    const navigate = useNavigate();
     const auth = getAuth();
     
     const isUsernameUnique = (username) => {
@@ -53,8 +50,7 @@ const Signup = (redirect) => {
         createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
           updateProfile(user, { displayName: data.username });
-          // Go to the set redirect path after creating an account
-          window.location.pathname=redirect
+          navigate(redirect, {replace: true});
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -89,7 +85,7 @@ const Signup = (redirect) => {
             alignItems="center"
             spacing={2}
             noValidate
-            onSubmit={handleSubmit(onSubmit)}>
+            onSubmit={handleSubmit(createUser)}>
             <div className='header'>
                 <div className="text">Sign Up</div>
                 <div className="underline"></div>

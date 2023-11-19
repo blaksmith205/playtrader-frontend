@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BuilderComponent, builder } from '@builder.io/react'
-import { useLocation } from "react-router-dom";
 import BUILDER_API_KEY from '../config.js';
 import NotFound from "./NotFound.jsx";
 import LoadingPage from "./LoadingPage.jsx";
@@ -11,7 +10,6 @@ builder.init(BUILDER_API_KEY);
 export default function BuilderPage({user, path, requireAuth, hide}) {
   const [pageJson, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
-  let location = useLocation();
  
   useEffect(() => {
     async function fetchPage() {
@@ -28,16 +26,16 @@ export default function BuilderPage({user, path, requireAuth, hide}) {
       }
     }
     fetchPage();
-  }, [path]);
+  }, [path, user]);
 
-  // Hide the login page is necessary and redirect to the provided url
-  if (hide && user) {
-    return (<Navigate to={hide.url}/>);
+  // Hide the login page if necessary and redirect to the provided url
+  if (hide && !loading && user) {
+    return (<Navigate to={hide.url} replace={true}/>);
   }
   // User needs to be signed in so redirect to login page
-  if (requireAuth && !user) {
-    return (<Navigate to={"/login"} state={{ from: location }}/>);
-  }
+  if (requireAuth && !loading && !user) {
+    return (<Navigate to={"/login"} replace={true}/>);
+  }  
   // Otherwise show the loading page when loading data
   if (loading) {
     return (
