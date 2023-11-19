@@ -7,7 +7,6 @@ import DynamicStockTable from './DynamicStockTable';
 export default function RegisterComponents() {
     Builder.registerComponent(Signup, {
         name: "SignUp",
-        inputs: [{ name: "redirect", type: "uri" }]
     });
     Builder.registerComponent(Login, {
         name: "Login",

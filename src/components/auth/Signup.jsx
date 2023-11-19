@@ -9,7 +9,7 @@ import { Stack, TextField, Button, InputAdornment } from '@mui/material';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import './LoginSignup.css'
 
-const Signup = (redirect) => {
+const Signup = () => {
     const { control, handleSubmit, getValues, setError, formState: {errors} } = useForm({mode: "onBlur"})
     const navigate = useNavigate();
     const auth = getAuth();
@@ -50,7 +50,7 @@ const Signup = (redirect) => {
         createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
           updateProfile(user, { displayName: data.username });
-          navigate(redirect, {replace: true});
+          navigate("/portfolio", {replace: true});
         })
         .catch((error) => {
             var errorCode = error.code;
